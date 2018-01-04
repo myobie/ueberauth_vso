@@ -1,7 +1,7 @@
-defmodule Ueberauth.Strategy.VSTS do
+defmodule Ueberauth.Strategy.VSO do
   use Ueberauth.Strategy, uid_field: :id,
                           default_scope: "vso.profile",
-                          oauth2_module: Ueberauth.Strategy.VSTS.OAuth
+                          oauth2_module: Ueberauth.Strategy.VSO.OAuth
 
   alias Ueberauth.Auth.Info
   alias Ueberauth.Auth.Credentials
@@ -42,8 +42,8 @@ defmodule Ueberauth.Strategy.VSTS do
 
   def handle_cleanup!(conn) do
     conn
-    |> put_private(:vsts_profile, nil)
-    |> put_private(:vsts_token, nil)
+    |> put_private(:vso_profile, nil)
+    |> put_private(:vso_token, nil)
   end
 
   def uid(conn) do
@@ -51,11 +51,11 @@ defmodule Ueberauth.Strategy.VSTS do
       conn
       |> option(:uid_field)
       |> to_string
-    conn.private.vsts_profile[field]
+    conn.private.vso_profile[field]
   end
 
   def credentials(conn) do
-    token        = conn.private.vsts_token
+    token        = conn.private.vso_token
     scope_string = (token.other_params["scope"] || "")
     scopes       = String.split(scope_string, ",")
 
@@ -70,7 +70,7 @@ defmodule Ueberauth.Strategy.VSTS do
   end
 
   def info(conn) do
-    profile = conn.private.vsts_profile
+    profile = conn.private.vso_profile
 
     name = profile["displayName"]
     email = profile["emailAddress"]
@@ -90,25 +90,25 @@ defmodule Ueberauth.Strategy.VSTS do
   def extra(conn) do
     %Extra {
       raw_info: %{
-        token: conn.private.vsts_token,
-        profile: conn.private.vsts_profile
+        token: conn.private.vso_token,
+        profile: conn.private.vso_profile
       }
     }
   end
 
   defp fetch_profile(conn, token) do
-    conn = put_private(conn, :vsts_token, token)
+    conn = put_private(conn, :vso_token, token)
 
-    with {:ok, profile} <- fetch_vsts_profile(token) do
-      put_private(conn, :vsts_profile, profile)
+    with {:ok, profile} <- fetch_vso_profile(token) do
+      put_private(conn, :vso_profile, profile)
     else
       error ->
         set_errors!(conn, [error])
     end
   end
 
-  defp fetch_vsts_profile(token) do
-    case Ueberauth.Strategy.VSTS.OAuth.get(token, "/_apis/profile/profiles/me?api-version=1.0") do
+  defp fetch_vso_profile(token) do
+    case Ueberauth.Strategy.VSO.OAuth.get(token, "/_apis/profile/profiles/me?api-version=1.0") do
       {:error, %OAuth2.Error{reason: reason}} ->
         error("OAuth2", reason)
       {:ok, %OAuth2.Response{status_code: 401, body: _body}} ->

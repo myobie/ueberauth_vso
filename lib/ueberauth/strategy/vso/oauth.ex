@@ -1,12 +1,12 @@
-defmodule Ueberauth.Strategy.VSTS.OAuth do
+defmodule Ueberauth.Strategy.VSO.OAuth do
   @moduledoc """
-  An implementation of OAuth2 for VSTS.
+  An implementation of OAuth2 for VSO.
 
   To add your `client_id` and `client_secret` include these values in your configuration.
 
-      config :ueberauth, Ueberauth.Strategy.VSTS.OAuth,
-        client_id: System.get_env("VSTS_APP_ID"),
-        client_secret: System.get_env("VSTS_CLIENT_SECRET")
+      config :ueberauth, Ueberauth.Strategy.VSO.OAuth,
+        client_id: System.get_env("VSO_APP_ID"),
+        client_secret: System.get_env("VSO_CLIENT_SECRET")
   """
 
   use OAuth2.Strategy
@@ -24,15 +24,15 @@ defmodule Ueberauth.Strategy.VSTS.OAuth do
 
   Optionally include any OAuth2 options here to be merged with the defaults.
 
-      Ueberauth.Strategy.VSTS.OAuth.client(redirect_uri: "http://localhost:4000/auth/vsts/callback")
+      Ueberauth.Strategy.VSO.OAuth.client(redirect_uri: "http://localhost:4000/auth/vso/callback")
 
-  This will be setup automatically for you in `Ueberauth.Strategy.VSTS`.
+  This will be setup automatically for you in `Ueberauth.Strategy.VSO`.
   These options are only useful for usage outside the normal callback phase of Ueberauth.
   """
   def client(opts \\ []) do
     config =
       :ueberauth
-      |> Application.fetch_env!(Ueberauth.Strategy.VSTS.OAuth)
+      |> Application.fetch_env!(Ueberauth.Strategy.VSO.OAuth)
       |> check_config_key_exists(:client_id)
       |> check_config_key_exists(:client_secret)
       |> check_config_key_exists(:redirect_uri)
@@ -50,11 +50,11 @@ defmodule Ueberauth.Strategy.VSTS.OAuth do
 
   ## Examples
 
-      iex> Ueberauth.Strategy.VSTS.OAuth.authorize_url!(
+      iex> Ueberauth.Strategy.VSO.OAuth.authorize_url!(
       ...>   scope: "vso.profile",
       ...>   state: 123
       ...> )
-      "https://app.vssps.visualstudio.com/oauth2/authorize?client_id=test&redirect_uri=http%3A%2F%2Flocalhost%3A4000%2Fauth%2Fvsts%2Fcallback&response_type=Assertion&scope=vso.profile&state=123"
+      "https://app.vssps.visualstudio.com/oauth2/authorize?client_id=test&redirect_uri=http%3A%2F%2Flocalhost%3A4000%2Fauth%2Fvso%2Fcallback&response_type=Assertion&scope=vso.profile&state=123"
   """
   def authorize_url!(params \\ [], opts \\ []) do
     opts
@@ -92,12 +92,12 @@ defmodule Ueberauth.Strategy.VSTS.OAuth do
 
   defp check_config_key_exists(config, key) when is_list(config) do
     unless Keyword.has_key?(config, key) do
-      raise "#{inspect key} missing from config :ueberauth, Ueberauth.Strategy.VSTS"
+      raise "#{inspect key} missing from config :ueberauth, Ueberauth.Strategy.VSO"
     end
     config
   end
 
   defp check_config_key_exists(_, _) do
-    raise "Config :ueberauth, Ueberauth.Strategy.VSTS is not a keyword list, as expected"
+    raise "Config :ueberauth, Ueberauth.Strategy.VSO is not a keyword list, as expected"
   end
 end

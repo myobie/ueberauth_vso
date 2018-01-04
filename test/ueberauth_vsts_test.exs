@@ -1,5 +1,5 @@
-defmodule UeberauthVSTSTest do
+defmodule UeberauthVSOTest do
   use ExUnit.Case
 
-  doctest Ueberauth.Strategy.VSTS.OAuth
+  doctest Ueberauth.Strategy.VSO.OAuth
 end
